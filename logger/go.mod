@@ -1,4 +1,4 @@
-module github.com/micro-gis/logger
+module github.com/micro-gis/utils/logger
 
 go 1.14
 
