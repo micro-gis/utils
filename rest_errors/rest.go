@@ -49,3 +49,11 @@ func NewInternalServerError(message string, err error) *RestErr {
 	}
 	return result
 }
+
+func NewUnauthorizedError() *RestErr {
+	return &RestErr{
+		Message: "unable to retrieve information with the given access token",
+		Status:  http.StatusUnauthorized,
+		Err:     "unauthorized",
+	}
+}
