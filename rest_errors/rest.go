@@ -1,6 +1,7 @@
 package rest_errors
 
 import (
+	"fmt"
 	"errors"
 	"net/http"
 )
@@ -8,7 +9,7 @@ import (
 type restErr struct {
 	message string        `json:"message"`
 	status  int           `json:"status"`
-	error   string        `json:"error"`
+	err     string        `json:"error"`
 	causes  []interface{} `json:"causes"`
 }
 
@@ -27,16 +28,24 @@ func NewRestError(message string, status int, err string, causes []interface{}) 
 	return restErr{
 		message: message,
 		status:  status,
-		error:   err,
+		err:     err,
 		causes:  causes,
 	}
+}
+
+func (e restErr) Error() string {
+	return fmt.Sprintf("message : %s - status : %d - error : %s - causes: [ %v]",
+		e.message,
+		e.status,
+		e.err,
+		e.causes)
 }
 
 func NewBadRequestError(message string) RestErr {
 	return restErr{
 		message: message,
 		status:  http.StatusBadRequest,
-		error:   "bad_request",
+		err:     "bad_request",
 	}
 }
 
@@ -44,7 +53,7 @@ func NewNotFoundError(message string) RestErr {
 	return restErr{
 		message: message,
 		status:  http.StatusNotFound,
-		error:   "not found",
+		err:     "not found",
 	}
 }
 
@@ -52,7 +61,7 @@ func NewInternalServerError(message string, err error) RestErr {
 	result := restErr{
 		message: message,
 		status:  http.StatusInternalServerError,
-		error:   "Internal_server_error",
+		err:     "Internal_server_error",
 	}
 	if err != nil {
 		result.causes = append(result.causes, err.Error())
@@ -64,7 +73,7 @@ func NewUnauthorizedError() RestErr {
 	return restErr{
 		message: "unable to retrieve information with the given access token",
 		status:  http.StatusUnauthorized,
-		error:   "unauthorized",
+		err:     "unauthorized",
 	}
 }
 
@@ -76,8 +85,8 @@ func (e restErr) Status() int {
 	return e.status
 }
 
-func (e restErr) Error() string {
-	return e.error
+func (e restErr) Err() string {
+	return e.err
 }
 
 func (e restErr) Causes() []interface{} {
