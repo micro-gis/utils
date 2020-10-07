@@ -1,6 +1,7 @@
 package rest_errors
 
 import (
+	"encoding/json"
 	"fmt"
 	"errors"
 	"net/http"
@@ -69,12 +70,22 @@ func NewInternalServerError(message string, err error) RestErr {
 	return result
 }
 
+func NewRestErrorFromBytes(bytes []byte) (RestErr, error) {
+	var apiErr restErr
+	if err := json.Unmarshal(bytes, &apiErr); err != nil {
+		return nil, errors.New("invalid json")
+	}
+	return apiErr, nil
+
+}
+
 func NewUnauthorizedError() RestErr {
 	return restErr{
 		message: "unable to retrieve information with the given access token",
 		status:  http.StatusUnauthorized,
 		err:     "unauthorized",
 	}
+
 }
 
 func (e restErr) Message() string {
