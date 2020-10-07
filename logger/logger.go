@@ -12,8 +12,8 @@ var (
 	log logger
 )
 
-const(
-	envLogLevel = "LOG_LEVEL"
+const (
+	envLogLevel  = "LOG_LEVEL"
 	envLogOutput = "LOG_OUTPUT"
 )
 
@@ -54,11 +54,11 @@ func init() {
 }
 
 func getLevel() zapcore.Level {
-	level :=strings.ToUpper(strings.TrimSpace(os.Getenv(envLogLevel)))
-	switch os.Getenv(level){
+	level := strings.ToUpper(strings.TrimSpace(os.Getenv(envLogLevel)))
+	switch os.Getenv(level) {
 	case "INFO":
 		return zap.InfoLevel
-	case "ERROR" :
+	case "ERROR":
 		return zap.ErrorLevel
 	case "DEBUG":
 		return zap.DebugLevel
@@ -71,8 +71,8 @@ func GetLogger() loggerInterface {
 	return log
 }
 
-func getOutput() string{
-	output :=strings.TrimSpace(os.Getenv(envLogOutput))
+func getOutput() string {
+	output := strings.TrimSpace(os.Getenv(envLogOutput))
 	if output == "" {
 		return "stdout"
 	}
@@ -81,24 +81,23 @@ func getOutput() string{
 
 func Info(msg string, tags ...zap.Field) {
 	log.log.Info(msg, tags...)
-	log.log.Sync()
+	_ = log.log.Sync()
 }
 
-func (l logger) Printf(format string, v ...interface{}){
-	if len(v)==0{
+func (l logger) Printf(format string, v ...interface{}) {
+	if len(v) == 0 {
 		Info(format)
-	}else {
+	} else {
 		Info(fmt.Sprintf(format, v...))
 	}
 }
 
-func (l logger) Print(v ...interface{}){
+func (l logger) Print(v ...interface{}) {
 	Info(fmt.Sprintf("%v", v))
 }
-
 
 func Error(msg string, err error, tags ...zap.Field) {
 	tags = append(tags, zap.Error(err))
 	log.log.Error(msg, tags...)
-	log.log.Sync()
+	_ = log.log.Sync()
 }
